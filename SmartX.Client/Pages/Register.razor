@@ -1,0 +1,245 @@
+﻿@page "/register"
+@using Smart.Shared
+@using SmartX.Client.Services
+@inject SensorApiClient Api
+
+<h1>📝 Register New Sensor</h1>
+
+<EditForm Model="model" OnValidSubmit="SubmitAsync">
+    <div class="mb-3">
+        <label class="form-label">Device MAC Address</label>
+        <InputText @bind-Value="model.DeviceMacAddress" class="form-control" placeholder="ESP32-A1B2C3" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Deployment Location</label>
+        <InputText @bind-Value="model.DeploymentLocation" class="form-control" placeholder="Zone 1 / Sub-Zone B / Node X" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Sensor Category</label>
+        <InputSelect @bind-Value="model.Category" class="form-select">
+            @foreach (var cat in Enum.GetValues<SensorCategory>())
+            {
+                <option value="@cat">@cat</option>
+            }
+        </InputSelect>
+    </div>
+    <button type="submit" class="btn btn-primary">Register</button>
+</EditForm>
+
+<hr class="my-4" />
+
+<h3>📎 Attach File / Photo to a Sensor</h3>
+<div class="row g-2">
+    <div class="col-md-5"><input class="form-control" placeholder="Sensor MAC" @bind="uploadMac" /></div>
+    <div class="col-md-5"><InputFile OnChange="OnFileSelected" class="form-control" /></div>
+    <div class="col-md-2"><button class="btn btn-success w-100" @onclick="UploadAsync" disabled="@(file is null)">Upload</button></div>
+</div>
+
+@if (!string.IsNullOrEmpty(statusMessage))
+{
+    <div class="alert @(statusSuccess ? "alert-success" : "alert-danger") mt-3">@statusMessage</div>
+}
+
+<hr class="my-4" />
+
+<h3>📡 Registered Sensors (@sensors.Count)</h3>
+
+@if (sensors.Count == 0)
+{
+    <div class="alert alert-info">No sensors registered yet. Use the form above to add one.</div>
+}
+else
+{
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>MAC Address</th>
+                <th>Location</th>
+                <th>Category</th>
+                <th>Registered At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in sensors.OrderByDescending(x => x.RegisteredAt))
+            {
+                <tr>
+                    <td><strong>@s.DeviceMacAddress</strong></td>
+                    <td>@s.DeploymentLocation</td>
+                    <td><span class="badge bg-primary">@s.Category</span></td>
+                    <td>@s.RegisteredAt.ToLocalTime().ToString("HH:mm:ss")</td>
+                    <td>
+                        <button class="btn btn-sm btn-info me-1" @onclick="() => ViewSensor(s)" title="View">👁️</button>
+                        <button class="btn btn-sm btn-warning me-1" @onclick="() => StartEdit(s)" title="Edit">✏️</button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => ConfirmDelete(s)" title="Delete">🗑️</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<!-- View Modal -->
+@if (viewingSensor != null)
+{
+    <div class="modal show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">👁️ Sensor Details</h5>
+                    <button class="btn-close" @onclick="() => viewingSensor = null"></button>
+                </div>
+                <div class="modal-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">MAC Address</dt>
+                        <dd class="col-sm-8">@viewingSensor.DeviceMacAddress</dd>
+                        <dt class="col-sm-4">Location</dt>
+                        <dd class="col-sm-8">@viewingSensor.DeploymentLocation</dd>
+                        <dt class="col-sm-4">Category</dt>
+                        <dd class="col-sm-8">@viewingSensor.Category</dd>
+                        <dt class="col-sm-4">Registered</dt>
+                        <dd class="col-sm-8">@viewingSensor.RegisteredAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</dd>
+                    </dl>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="() => viewingSensor = null">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Edit Modal -->
+@if (editingSensor != null)
+{
+    <div class="modal show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">✏️ Edit Sensor — @editingSensor.DeviceMacAddress</h5>
+                    <button class="btn-close" @onclick="() => editingSensor = null"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Deployment Location</label>
+                        <input class="form-control" @bind="editingSensor.DeploymentLocation" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sensor Category</label>
+                        <select class="form-select" @bind="editingSensor.Category">
+                            @foreach (var cat in Enum.GetValues<SensorCategory>())
+                            {
+                                <option value="@cat">@cat</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="() => editingSensor = null">Cancel</button>
+                    <button class="btn btn-primary" @onclick="SaveEditAsync">💾 Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Delete Confirm Modal -->
+@if (deletingSensor != null)
+{
+    <div class="modal show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">🗑️ Delete Sensor?</h5>
+                    <button class="btn-close" @onclick="() => deletingSensor = null"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete <strong>@deletingSensor.DeviceMacAddress</strong>? This cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="() => deletingSensor = null">Cancel</button>
+                    <button class="btn btn-danger" @onclick="ConfirmDeleteAsync">🗑️ Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private SensorRegistration model = new();
+    private string uploadMac = "";
+    private IBrowserFile? file;
+    private string statusMessage = "";
+    private bool statusSuccess;
+    private List<SensorRegistration> sensors = new();
+
+    private SensorRegistration? viewingSensor;
+    private SensorRegistration? editingSensor;
+    private SensorRegistration? deletingSensor;
+
+    protected override async Task OnInitializedAsync() => await LoadSensorsAsync();
+
+    private async Task LoadSensorsAsync()
+    {
+        sensors = await Api.GetSensorsAsync();
+    }
+
+    private async Task SubmitAsync()
+    {
+        var ok = await Api.RegisterSensorAsync(model);
+        statusSuccess = ok;
+        statusMessage = ok ? "✅ Sensor registered!" : "❌ Failed.";
+        if (ok)
+        {
+            model = new();
+            await LoadSensorsAsync();
+        }
+    }
+
+    private void OnFileSelected(InputFileChangeEventArgs e) { file = e.File; statusMessage = ""; }
+
+    private async Task UploadAsync()
+    {
+        if (file is null || string.IsNullOrWhiteSpace(uploadMac)) return;
+        await using var stream = file.OpenReadStream(maxAllowedSize: 20 * 1024 * 1024);
+        var ok = await Api.UploadAttachmentAsync(uploadMac, stream, file.Name);
+        statusSuccess = ok;
+        statusMessage = ok ? $"✅ Uploaded {file.Name}" : "❌ Upload failed.";
+    }
+
+    private void ViewSensor(SensorRegistration s) { viewingSensor = s; }
+
+    private void StartEdit(SensorRegistration s)
+    {
+        // Make a copy so we can cancel without affecting the original
+        editingSensor = new SensorRegistration
+        {
+            DeviceMacAddress = s.DeviceMacAddress,
+            DeploymentLocation = s.DeploymentLocation,
+            Category = s.Category,
+            RegisteredAt = s.RegisteredAt
+        };
+    }
+
+    private async Task SaveEditAsync()
+    {
+        if (editingSensor is null) return;
+        var ok = await Api.UpdateSensorAsync(editingSensor.DeviceMacAddress, editingSensor);
+        statusSuccess = ok;
+        statusMessage = ok ? "✅ Sensor updated!" : "❌ Update failed.";
+        editingSensor = null;
+        await LoadSensorsAsync();
+    }
+
+    private void ConfirmDelete(SensorRegistration s) { deletingSensor = s; }
+
+    private async Task ConfirmDeleteAsync()
+    {
+        if (deletingSensor is null) return;
+        var ok = await Api.DeleteSensorAsync(deletingSensor.DeviceMacAddress);
+        statusSuccess = ok;
+        statusMessage = ok ? "🗑️ Sensor deleted." : "❌ Delete failed.";
+        deletingSensor = null;
+        await LoadSensorsAsync();
+    }
+}
