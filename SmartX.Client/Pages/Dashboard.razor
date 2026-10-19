@@ -1,0 +1,98 @@
+﻿@page "/dashboard"
+@using Smart.Shared
+@using SmartX.Client.Services
+@inject SensorApiClient Api
+
+<h1>📊 Telemetry Dashboard</h1>
+<p class="text-muted">Progressive Disclosure with Anomaly Highlighting</p>
+
+<div class="mb-3">
+    <button class="btn btn-primary" @onclick="LoadAsync">🔄 Refresh</button>
+    <button class="btn btn-outline-danger" @onclick="SeedAnomaly">💥 Simulate Anomaly</button>
+</div>
+
+@if (loading)
+{
+    <p><em>Loading...</em></p>
+}
+else if (packets.Count == 0)
+{
+    <div class="alert alert-info">No telemetry yet. Click "Simulate Anomaly".</div>
+}
+else
+{
+    var badCount = packets.Count(p => IsAnomaly(p.SensorValue));
+
+    @if (badCount > 0)
+    {
+        <div class="alert alert-danger">🚨 <strong>CRITICAL ANOMALY DETECTED</strong> — @badCount reading(s) above threshold.</div>
+    }
+    else
+    {
+        <div class="alert alert-success">✅ <strong>All Systems Normal</strong></div>
+    }
+
+    <table class="table table-striped">
+        <thead><tr><th>MAC</th><th>Time</th><th>Value</th><th>Status</th><th>Details</th></tr></thead>
+        <tbody>
+            @foreach (var p in packets.OrderByDescending(x => x.Timestamp))
+            {
+                var isBad = IsAnomaly(p.SensorValue);
+                <tr class="@(isBad ? "table-danger" : "")">
+                    <td>@p.DeviceMac</td>
+                    <td>@p.Timestamp.ToLocalTime().ToString("HH:mm:ss")</td>
+                    <td><strong>@p.SensorValue</strong></td>
+                    <td>@if (isBad) {
+                        <span class="badge bg-danger">ANOMALY</span>
+                    } else
+                    {
+
+                        <span class="badge bg-success">OK</span>
+                    }
+                </td>
+                <td>
+                    @if (isBad)
+                    {
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => Toggle(p.DeviceMac)">
+                            @(expanded.Contains(p.DeviceMac) ? "Hide" : "Show")
+                        </button>
+                        @if (expanded.Contains(p.DeviceMac))
+                        {
+                            <div class="mt-2 p-2 border rounded bg-white"><small>Raw: @p.SensorValue | UTC: @p.Timestamp.ToString("O")</small></div>
+                        }
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+}
+
+@code {
+    private List<TelemetryPacket<float>> packets = new();
+    private HashSet<string> expanded = new();
+    private bool loading = true;
+    private const float Threshold = 100f;
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        loading = true;
+        packets = await Api.GetRecentTelemetryAsync();
+        loading = false;
+    }
+
+    private bool IsAnomaly(float v) => v > Threshold;
+
+    private void Toggle(string mac) { if (!expanded.Add(mac)) expanded.Remove(mac); }
+
+    private async Task SeedAnomaly()
+    {
+        var rand = new Random();
+        var mac = $"ESP32-{rand.Next(1000, 9999)}";
+        await Api.SendTelemetryAsync(new TelemetryPacket<float>(mac, rand.Next(10, 80)));
+        await Api.SendTelemetryAsync(new TelemetryPacket<float>(mac, rand.Next(150, 300)));
+        await LoadAsync();
+    }
+}
