@@ -1,0 +1,254 @@
+﻿@page "/command-stream"
+@using Smart.Shared
+@using SmartX.Client.Services
+@inject SensorApiClient Api
+@implements IDisposable
+
+<!-- Enterprise Dark Header -->
+<div class="bg-dark text-white py-4 mb-4 shadow-sm" style="border-bottom: 3px solid #0d6efd;">
+    <div class="container-fluid px-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-0 fw-bold"><i class="bi bi-lightning-charge-fill text-warning"></i> Real-Time Command Stream</h2>
+                <p class="text-muted mb-0 mt-1" style="font-size: 0.9rem;">Live telemetry processing & device overrides</p>
+            </div>
+            <div>
+                <button class="btn btn-warning fw-bold text-dark shadow-sm me-2" @onclick="SimulateDrop">
+                    <i class="bi bi-droplet-half"></i> Simulate Moisture Drop
+                </button>
+                <button class="btn btn-outline-light me-2" @onclick="RefreshData">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+                <button class="btn btn-danger shadow-sm" @onclick="UndoCommand">
+                    <i class="bi bi-arrow-counterclockwise"></i> Undo Last Action
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-4">
+
+    <!-- Predictive Engine Banner (Looks like an AI alert) -->
+    @if (!string.IsNullOrEmpty(recommendation))
+    {
+        <div class="alert alert-warning border-warning shadow-sm d-flex justify-content-between align-items-center mb-4" role="alert" style="border-left: 5px solid #ffc107;">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-robot fs-3 me-3 text-warning"></i>
+                <div>
+                    <h6 class="alert-heading fw-bold mb-1">Predictive Engine Suggestion</h6>
+                    <span>@recommendation</span>
+                </div>
+            </div>
+            <button type="button" class="btn-close" @onclick="DismissRecommendation"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Left Column: Live Telemetry & Filters -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3 border-bottom-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold text-secondary"><i class="bi bi-activity text-primary"></i> Live Telemetry Queue</h5>
+                    <div class="d-flex gap-2">
+                        <div class="input-group input-group-sm shadow-sm">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0 bg-light" placeholder="Search MAC..." @bind="searchTerm" @bind:event="oninput" @bind:after="LogSearchAsync" style="width: 200px;" />
+                        </div>
+                        <select class="form-select form-select-sm shadow-sm bg-light" @bind="filterCategory" style="width: 150px;">
+                            <option value="All">All Categories</option>
+                            <option value="Environmental">Environmental</option>
+                            <option value="Power">Power</option>
+                            <option value="Actuator">Actuator</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light text-muted" style="position: sticky; top: 0; z-index: 1;">
+                                <tr>
+                                    <th class="ps-4">Time</th>
+                                    <th>Device MAC</th>
+                                    <th>Value</th>
+                                    <th>Status</th>
+                                    <th class="text-end pe-4">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (filteredTelemetry.Count == 0)
+                                {
+                                    <tr><td colspan="5" class="text-center text-muted py-5">No telemetry packets found.</td></tr>
+                                }
+                                @foreach (var p in filteredTelemetry)
+                                {
+                                    <tr class="@(p.SensorValue > 100 ? "table-danger" : "")">
+                                        <td class="ps-4 text-muted small">@p.Timestamp.ToLocalTime().ToString("HH:mm:ss")</td>
+                                        <td class="fw-semibold">@p.DeviceMac</td>
+                                        <td class="fw-bold">@p.SensorValue</td>
+                                        <td>
+                                            @if (p.SensorValue > 100)
+                                            {
+                                                <span class="badge bg-danger rounded-pill px-3">CRITICAL</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-success rounded-pill px-3">OK</span>
+                                            }
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            <button class="btn btn-sm btn-outline-secondary py-0" @onclick="() => RestartDevice(p.DeviceMac)">Restart</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Manual Command Console -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-sliders"></i> Manual Override</h5>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted small mb-4">Commands are pushed to the stack for instant Undo capability.</p>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-secondary small text-uppercase">Target Device MAC</label>
+                        <input type="text" class="form-control form-control-lg bg-light" placeholder="e.g. ESP32-1234" @bind="targetMac" />
+                    </div>
+
+                    <label class="form-label fw-bold text-secondary small text-uppercase">Available Commands</label>
+                    <div class="d-grid gap-2 mb-4">
+                        <button class="btn btn-outline-success btn-lg fs-6 fw-bold" @onclick="TogglePump">💧 Toggle Pump A</button>
+                        <button class="btn btn-outline-warning btn-lg fs-6 fw-bold" @onclick="ToggleRelay">⚡ Toggle Relay 1</button>
+                        <button class="btn btn-outline-danger btn-lg fs-6 fw-bold" @onclick="EmergencyShutoff">🚨 Emergency Shutoff</button>
+                    </div>
+
+                    <label class="form-label fw-bold text-secondary small text-uppercase">Console Output</label>
+                    <div class="bg-dark text-success p-3 rounded font-monospace small shadow-inner" style="min-height: 80px;">
+                        > @(string.IsNullOrEmpty(consoleMessage) ? "Awaiting command..." : consoleMessage)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<TelemetryPacket<float>> telemetry = new();
+    private System.Threading.Timer? _timer;
+
+    private string searchTerm = "";
+    private string filterCategory = "All";
+
+    private string targetMac = "";
+    private string consoleMessage = "";
+    private string recommendation = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshData();
+        _timer = new System.Threading.Timer(async _ =>
+        {
+            await InvokeAsync(async () =>
+            {
+                await RefreshData();
+                StateHasChanged();
+            });
+        }, null, 2000, 2000);
+    }
+
+    private void DismissRecommendation()
+    {
+        recommendation = string.Empty;
+    }
+
+    private async Task RefreshData()
+    {
+        telemetry = await Api.GetRecentTelemetryAsync();
+
+        var rec = await Api.GetRecommendationAsync();
+        if (!string.IsNullOrEmpty(rec) && rec != recommendation)
+        {
+            recommendation = rec;
+        }
+    }
+
+    private List<TelemetryPacket<float>> filteredTelemetry => telemetry.Where(t =>
+        string.IsNullOrEmpty(searchTerm) || t.DeviceMac.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+    ).ToList();
+
+    private async Task LogSearchAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            await Api.LogSearchAsync(searchTerm);
+            recommendation = await Api.GetRecommendationAsync();
+        }
+    }
+
+    private async Task SimulateDrop()
+    {
+        await Api.SimulateMoistureDropAsync();
+        consoleMessage = "⚠️ Simulated critical moisture drop on ESP32-FARM-A.";
+        await RefreshData();
+    }
+
+    private async Task RestartDevice(string mac)
+    {
+        await IssueCommand(mac, "Restart");
+    }
+
+    private async Task TogglePump()
+    {
+        await IssueCommand(targetMac, "Toggle Pump A");
+    }
+
+    private async Task ToggleRelay()
+    {
+        await IssueCommand(targetMac, "Toggle Relay 1");
+    }
+
+    private async Task EmergencyShutoff()
+    {
+        await IssueCommand(targetMac, "Emergency Shutoff");
+    }
+
+    private async Task IssueCommand(string mac, string action)
+    {
+        if (string.IsNullOrWhiteSpace(mac))
+        {
+            consoleMessage = "❌ Error: Target MAC required.";
+            return;
+        }
+
+        string fullCommand = $"{action} on {mac}";
+        var success = await Api.ExecuteCommandAsync(fullCommand);
+
+        if (success)
+        {
+            consoleMessage = $"✅ Executed: {fullCommand}";
+            targetMac = "";
+        }
+        else
+        {
+            consoleMessage = $"❌ Failed to execute: {fullCommand}";
+        }
+    }
+
+    private async Task UndoCommand()
+    {
+        var result = await Api.UndoLastCommandAsync();
+        consoleMessage = $"⏪ {result}";
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
+}
