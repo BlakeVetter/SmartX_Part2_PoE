@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "mmmn54pVwo8=",
+  "dgSpecHash": "Yf7ooP0Z9vE=",
   "success": false,
   "projectFilePath": "C:\\Users\\emeris\\Documents\\GitHub\\SmartX_Part2_PoE\\SmartX.Client\\SmartX.Client.csproj",
   "expectedPackageFiles": [
@@ -39,6 +39,18 @@
     "C:\\Users\\emeris\\.nuget\\packages\\microsoft.netcore.app.runtime.mono.browser-wasm\\10.0.12\\microsoft.netcore.app.runtime.mono.browser-wasm.10.0.12.nupkg.sha512"
   ],
   "logs": [
+    {
+      "code": "NU1104",
+      "level": "Error",
+      "message": "Unable to find project 'C:\\Users\\emeris\\Documents\\GitHub\\SmartX_Part2_PoE\\Smart.Shared\\Smart.Shared.csproj'. Check that the project reference is valid and that the project file exists.",
+      "projectPath": "C:\\Users\\emeris\\Documents\\GitHub\\SmartX_Part2_PoE\\SmartX.Client\\SmartX.Client.csproj",
+      "filePath": "C:\\Users\\emeris\\Documents\\GitHub\\SmartX_Part2_PoE\\SmartX.Client\\SmartX.Client.csproj",
+      "libraryId": "C:\\Users\\emeris\\Documents\\GitHub\\SmartX_Part2_PoE\\Smart.Shared\\Smart.Shared.csproj",
+      "targetGraphs": [
+        "net10.0",
+        "net10.0/browser-wasm"
+      ]
+    },
     {
       "code": "NU1104",
       "level": "Error",

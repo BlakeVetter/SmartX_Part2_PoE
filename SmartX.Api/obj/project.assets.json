@@ -36,19 +36,6 @@
             "related": ".pdb;.xml"
           }
         }
-      },
-      "Smart.Shared/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v10.0",
-        "dependencies": {
-          "Microsoft.OpenApi": "2.7.5"
-        },
-        "compile": {
-          "bin/placeholder/Smart.Shared.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Smart.Shared.dll": {}
-        }
       }
     }
   },
@@ -88,19 +75,13 @@
         "microsoft.openapi.2.7.5.nupkg.sha512",
         "microsoft.openapi.nuspec"
       ]
-    },
-    "Smart.Shared/1.0.0": {
-      "type": "project",
-      "path": "../../../../source/repos/Smart.Shared/Smart.Shared.csproj",
-      "msbuildProject": "../../../../source/repos/Smart.Shared/Smart.Shared.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net10.0": [
       "C:\\Users\\emeris\\Documents\\GitHub\\Smart.Shared\\Smart.Shared.csproj",
       "Microsoft.AspNetCore.OpenApi >= 10.0.9",
-      "Microsoft.OpenApi >= 2.7.5",
-      "Smart.Shared >= 1.0.0"
+      "Microsoft.OpenApi >= 2.7.5"
     ]
   },
   "packageFolders": {
@@ -138,9 +119,6 @@
           "projectReferences": {
             "C:\\Users\\emeris\\Documents\\GitHub\\Smart.Shared\\Smart.Shared.csproj": {
               "projectPath": "C:\\Users\\emeris\\Documents\\GitHub\\Smart.Shared\\Smart.Shared.csproj"
-            },
-            "C:\\Users\\emeris\\source\\repos\\Smart.Shared\\Smart.Shared.csproj": {
-              "projectPath": "C:\\Users\\emeris\\source\\repos\\Smart.Shared\\Smart.Shared.csproj"
             }
           }
         }

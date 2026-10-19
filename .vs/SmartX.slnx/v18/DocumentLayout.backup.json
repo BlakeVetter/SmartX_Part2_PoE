@@ -1,16 +1,7 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\emeris\\Documents\\GitHub\\SmartX_Part2_PoE\\",
-  "Documents": [
-    {
-      "AbsoluteMoniker": "D:0:0:{2FC033E8-F118-24ED-0DDC-C7AEE228B8D8}|SmartX.Api\\SmartX.Api.csproj|c:\\users\\emeris\\documents\\github\\smartx_part2_poe\\smartx.api\\smartx.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{2FC033E8-F118-24ED-0DDC-C7AEE228B8D8}|SmartX.Api\\SmartX.Api.csproj|solutionrelative:smartx.api\\smartx.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C27618AA-3AA6-7B70-0E39-11554CFF3B12}|SmartX.Client\\SmartX.Client.csproj|c:\\users\\emeris\\documents\\github\\smartx_part2_poe\\smartx.client\\smartx.client.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{C27618AA-3AA6-7B70-0E39-11554CFF3B12}|SmartX.Client\\SmartX.Client.csproj|solutionrelative:smartx.client\\smartx.client.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
-    }
-  ],
+  "Documents": [],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -18,34 +9,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": -1,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "SmartX.Api",
-              "DocumentMoniker": "C:\\Users\\emeris\\Documents\\GitHub\\SmartX_Part2_PoE\\SmartX.Api\\SmartX.Api.csproj",
-              "RelativeDocumentMoniker": "SmartX.Api\\SmartX.Api.csproj",
-              "ToolTip": "C:\\Users\\emeris\\Documents\\GitHub\\SmartX_Part2_PoE\\SmartX.Api\\SmartX.Api.csproj*",
-              "RelativeToolTip": "SmartX.Api\\SmartX.Api.csproj*",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAcwA4AAABcAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-10-19T20:53:12.99Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "SmartX.Client",
-              "DocumentMoniker": "C:\\Users\\emeris\\Documents\\GitHub\\SmartX_Part2_PoE\\SmartX.Client\\SmartX.Client.csproj",
-              "RelativeDocumentMoniker": "SmartX.Client\\SmartX.Client.csproj",
-              "ToolTip": "C:\\Users\\emeris\\Documents\\GitHub\\SmartX_Part2_PoE\\SmartX.Client\\SmartX.Client.csproj*",
-              "RelativeToolTip": "SmartX.Client\\SmartX.Client.csproj*",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAABcAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-10-19T20:54:29.653Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
