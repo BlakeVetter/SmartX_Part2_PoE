@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "40BFfLeRSeg=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\emeris\\source\\repos\\Smart.Shared\\Smart.Shared.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\emeris\\.nuget\\packages\\microsoft.openapi\\2.7.5\\microsoft.openapi.2.7.5.nupkg.sha512"
+  ],
+  "logs": []
+}

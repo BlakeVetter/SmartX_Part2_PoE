@@ -1,0 +1,14 @@
+C:\Users\emeris\source\repos\Smart.Shared\bin\Debug\net10.0\Smart.Shared.deps.json
+C:\Users\emeris\source\repos\Smart.Shared\bin\Debug\net10.0\Smart.Shared.dll
+C:\Users\emeris\source\repos\Smart.Shared\bin\Debug\net10.0\Smart.Shared.pdb
+C:\Users\emeris\source\repos\Smart.Shared\obj\Debug\net10.0\Smart.Shared.csproj.AssemblyReference.cache
+C:\Users\emeris\source\repos\Smart.Shared\obj\Debug\net10.0\Smart.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\emeris\source\repos\Smart.Shared\obj\Debug\net10.0\Smart.Shared.AssemblyInfoInputs.cache
+C:\Users\emeris\source\repos\Smart.Shared\obj\Debug\net10.0\Smart.Shared.AssemblyInfo.cs
+C:\Users\emeris\source\repos\Smart.Shared\obj\Debug\net10.0\Smart.Shared.csproj.CoreCompileInputs.cache
+C:\Users\emeris\source\repos\Smart.Shared\obj\Debug\net10.0\Smart.Shared.sourcelink.json
+C:\Users\emeris\source\repos\Smart.Shared\obj\Debug\net10.0\Smart.Shared.dll
+C:\Users\emeris\source\repos\Smart.Shared\obj\Debug\net10.0\refint\Smart.Shared.dll
+C:\Users\emeris\source\repos\Smart.Shared\obj\Debug\net10.0\Smart.Shared.pdb
+C:\Users\emeris\source\repos\Smart.Shared\obj\Debug\net10.0\ref\Smart.Shared.dll
+C:\Users\emeris\source\repos\Smart.Shared\obj\Debug\net10.0\Smart.Sh.6402E21D.Up2Date
