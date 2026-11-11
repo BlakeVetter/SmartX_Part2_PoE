@@ -80,6 +80,7 @@
   "projectFileDependencyGroups": {
     "net10.0": [
       "C:\\Users\\emeris\\Documents\\GitHub\\Smart.Shared\\Smart.Shared.csproj",
+      "C:\\Users\\emeris\\Documents\\GitHub\\SmartX_Part2_PoE\\Smart.Shared\\Smart.Shared.csproj",
       "Microsoft.AspNetCore.OpenApi >= 10.0.9",
       "Microsoft.OpenApi >= 2.7.5"
     ]
@@ -119,6 +120,9 @@
           "projectReferences": {
             "C:\\Users\\emeris\\Documents\\GitHub\\Smart.Shared\\Smart.Shared.csproj": {
               "projectPath": "C:\\Users\\emeris\\Documents\\GitHub\\Smart.Shared\\Smart.Shared.csproj"
+            },
+            "C:\\Users\\emeris\\Documents\\GitHub\\SmartX_Part2_PoE\\Smart.Shared\\Smart.Shared.csproj": {
+              "projectPath": "C:\\Users\\emeris\\Documents\\GitHub\\SmartX_Part2_PoE\\Smart.Shared\\Smart.Shared.csproj"
             }
           }
         }
@@ -587,6 +591,15 @@
     }
   },
   "logs": [
+    {
+      "code": "NU1104",
+      "level": "Error",
+      "message": "Unable to find project 'C:\\Users\\emeris\\Documents\\GitHub\\SmartX_Part2_PoE\\Smart.Shared\\Smart.Shared.csproj'. Check that the project reference is valid and that the project file exists.",
+      "libraryId": "C:\\Users\\emeris\\Documents\\GitHub\\SmartX_Part2_PoE\\Smart.Shared\\Smart.Shared.csproj",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
     {
       "code": "NU1104",
       "level": "Error",

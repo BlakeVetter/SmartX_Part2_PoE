@@ -12,7 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
-<ProjectReference Include="..\..\Smart.Shared\Smart.Shared.csproj" />   
+	 <ProjectReference Include="..\Smart.Shared\Smart.Shared.csproj" />
+	  <ProjectReference Include="..\Smart.Shared\Smart.Shared.csproj" />
+	  <ProjectReference Include="..\..\Smart.Shared\Smart.Shared.csproj" />   
     <ProjectReference Include="..\..\Smart.Shared\Smart.Shared.csproj" />
   </ItemGroup>
 

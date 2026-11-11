@@ -1,0 +1,2 @@
+C:\Users\emeris\Documents\GitHub\SmartX_Part2_PoE\SmartX.Client\obj\Debug\net10.0\EmbeddedAttribute.cs
+C:\Users\emeris\Documents\GitHub\SmartX_Part2_PoE\SmartX.Client\obj\Debug\net10.0\ValidatableTypeAttribute.cs
